@@ -1,12 +1,12 @@
 package com.jakubu9333
 
 import com.jakubu9333.plugins.*
-import com.jakubu9333.repositories.DatabaseTodoRepository
+import com.jakubu9333.repositories.JdbcDatabaseRepository
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.h2.jdbcx.JdbcConnectionPool
-import org.jetbrains.exposed.sql.Database
+import javax.sql.DataSource
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
@@ -19,15 +19,14 @@ fun Application.module() {
     //configureTemplating()
     configureHTTP()
     configureMonitoring()
-    val database = initDatabase()
-    val databaseTodoRepository = DatabaseTodoRepository(database)
+    val database = initDataBasePool()
+    val databaseTodoRepository = JdbcDatabaseRepository(database)
     configureRouting(databaseTodoRepository)
 }
 
-fun initDatabase(): Database {
+fun initDataBasePool(): DataSource{
     val driverClassName = "org.h2.Driver"
     val jdbcURL = "jdbc:h2:file:./build/db"
     val pool = JdbcConnectionPool.create(jdbcURL,"","")
-    val database = Database.connect(pool)
-    return database
+    return pool
 }

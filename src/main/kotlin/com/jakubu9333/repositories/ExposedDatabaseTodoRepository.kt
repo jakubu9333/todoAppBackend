@@ -1,14 +1,12 @@
 package com.jakubu9333.repositories
 
-import io.ktor.server.html.*
-import io.ktor.util.logging.*
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class DatabaseTodoRepository(database: Database) : TodoRepository {
+class ExposedDatabaseTodoRepository(database: Database) : TodoRepository {
     object Todos : Table() {
         val id = integer("id").autoIncrement()
         val item = varchar("item", length = 255)
