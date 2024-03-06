@@ -46,6 +46,17 @@ class JdbcDatabaseRepository(private val dataSource: DataSource) : TodoRepositor
 
         }
 
+    override suspend fun addBatch(todoItems: List<TodoItem>) {
+       runQuery { connection ->
+           val statement = connection.prepareStatement(INSERT_SQL)
+           todoItems.forEach {
+               statement.setString(1,it.item)
+               statement.addBatch()
+           }
+           statement.executeBatch()
+       }
+    }
+
     override suspend fun getAll(): List<TodoItem> =
         runQuery {
             val statement = it.createStatement()

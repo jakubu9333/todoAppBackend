@@ -31,6 +31,14 @@ class ExposedDatabaseTodoRepository(database: Database) : TodoRepository {
         }
     }
 
+    override suspend fun addBatch(todoItems: List<TodoItem>) {
+        dbQuery {
+            Todos.batchInsert(todoItems){
+                this[Todos.item] = it.item
+            }
+        }
+    }
+
     override suspend fun getAll(): List<TodoItem> {
         return dbQuery {
             Todos.selectAll().map { TodoItem(it[Todos.item]) }
