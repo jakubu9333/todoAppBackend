@@ -7,6 +7,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.util.UUID
 
 
 fun Route.apiPostTodo(todoRepository: TodoRepository) {
@@ -39,7 +40,7 @@ fun Route.apiGetAllTodo(todoRepository: TodoRepository) {
 
 fun Route.apiDeleteTodo(todoRepository: TodoRepository) {
     delete("/api/todo/{id}") {
-        val id = call.parameters["id"]?.toInt()
+        val id = call.parameters["id"]?.let { UUID.fromString(it) }
         if (id == null) {
             call.respond(HttpStatusCode.BadRequest, "no id")
             return@delete

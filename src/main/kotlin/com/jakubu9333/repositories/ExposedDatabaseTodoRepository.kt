@@ -5,10 +5,11 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.UUID
 
 class ExposedDatabaseTodoRepository(database: Database) : TodoRepository {
     object Todos : Table() {
-        val id = integer("id").autoIncrement()
+        val id = uuid("id")
         val item = varchar("item", length = 255)
 
         override val primaryKey = PrimaryKey(id)
@@ -23,9 +24,10 @@ class ExposedDatabaseTodoRepository(database: Database) : TodoRepository {
     private suspend fun <T> dbQuery(block: suspend Transaction.() -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
 
-    override suspend fun add(todoItem: TodoItem): Int {
+    override suspend fun add(todoItem: TodoItem): UUID {
         return dbQuery {
             Todos.insert {
+                it[id] = todoItem.id
                 it[item] = todoItem.item
             }[Todos.id]
         }
@@ -33,7 +35,7 @@ class ExposedDatabaseTodoRepository(database: Database) : TodoRepository {
 
     override suspend fun addBatch(todoItems: List<TodoItem>) {
         dbQuery {
-            Todos.batchInsert(todoItems){
+            Todos.batchInsert(todoItems) {
                 this[Todos.item] = it.item
             }
         }
@@ -41,12 +43,12 @@ class ExposedDatabaseTodoRepository(database: Database) : TodoRepository {
 
     override suspend fun getAll(): List<TodoItem> {
         return dbQuery {
-            Todos.selectAll().map { TodoItem(it[Todos.item]) }
+            Todos.selectAll().map { TodoItem(it[Todos.id],it[Todos.item]) }
         }
 
     }
 
-    override suspend fun delete(id: Int) {
+    override suspend fun delete(id: UUID) {
         dbQuery {
             Todos.deleteWhere { Todos.id.eq(id) }
         }

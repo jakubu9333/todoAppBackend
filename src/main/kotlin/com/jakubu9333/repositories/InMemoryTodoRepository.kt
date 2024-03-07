@@ -1,19 +1,19 @@
 package com.jakubu9333.repositories
 
+import java.util.UUID
+
 class InMemoryTodoRepository : TodoRepository {
 
-    private val storage = HashMap<Int, TodoItem>()
+    private val storage = HashMap<UUID, TodoItem>()
 
-    private var id = 0
-    override suspend fun add(todoItem: TodoItem): Int {
-        storage[id] = todoItem
-        return id++
+    override suspend fun add(todoItem: TodoItem): UUID{
+        storage[todoItem.id] = todoItem
+        return todoItem.id
     }
 
     override suspend fun addBatch(todoItems: List<TodoItem>) {
         todoItems.forEach {
-            storage[id] = it
-            id++
+            storage[it.id] = it
         }
     }
 
@@ -21,7 +21,7 @@ class InMemoryTodoRepository : TodoRepository {
         return storage.values.toList()
     }
 
-    override suspend fun delete(id: Int) {
+    override suspend fun delete(id: UUID) {
         storage.remove(id)
     }
 }
