@@ -24,12 +24,13 @@ class ExposedDatabaseTodoRepository(database: Database) : TodoRepository {
     private suspend fun <T> dbQuery(block: suspend Transaction.() -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
 
-    override suspend fun add(todoItem: TodoItem): UUID {
+    override suspend fun add(todoItem: TodoItem): TodoItem {
         return dbQuery {
             Todos.insert {
                 it[id] = todoItem.id
                 it[item] = todoItem.item
-            }[Todos.id]
+            }
+            return@dbQuery todoItem
         }
     }
 
@@ -43,7 +44,7 @@ class ExposedDatabaseTodoRepository(database: Database) : TodoRepository {
 
     override suspend fun getAll(): List<TodoItem> {
         return dbQuery {
-            Todos.selectAll().map { TodoItem(it[Todos.id],it[Todos.item]) }
+            Todos.selectAll().map { TodoItem(it[Todos.id], it[Todos.item]) }
         }
 
     }

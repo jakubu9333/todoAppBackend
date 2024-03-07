@@ -6,9 +6,9 @@ class InMemoryTodoRepository : TodoRepository {
 
     private val storage = HashMap<UUID, TodoItem>()
 
-    override suspend fun add(todoItem: TodoItem): UUID{
+    override suspend fun add(todoItem: TodoItem): TodoItem{
         storage[todoItem.id] = todoItem
-        return todoItem.id
+        return todoItem
     }
 
     override suspend fun addBatch(todoItems: List<TodoItem>) {

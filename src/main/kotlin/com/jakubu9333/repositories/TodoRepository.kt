@@ -4,7 +4,7 @@ import java.util.UUID
 
 interface TodoRepository {
 
-    suspend fun add(todoItem: TodoItem): UUID
+    suspend fun add(todoItem: TodoItem): TodoItem
     suspend fun addBatch(todoItems: List<TodoItem>)
 
     suspend fun getAll(): List<TodoItem>

@@ -28,10 +28,10 @@ class JdbcDatabaseRepositoryTest {
     @Test
     fun add() = runTest {
         val todoItem = TodoItem(UUID.randomUUID(), "xd")
-        val id = jdbcDatabaseRepository.add(todoItem)
+        val actualItem = jdbcDatabaseRepository.add(todoItem)
 
         val expected = listOf(todoItem)
-        assertEquals(id, todoItem.id)
+        assertEquals(actualItem, todoItem)
         assertEquals(expected, jdbcDatabaseRepository.getAll())
     }
 
@@ -49,12 +49,12 @@ class JdbcDatabaseRepositoryTest {
     @Test
     fun delete() = runTest{
         val todoItem = TodoItem(UUID.randomUUID(), "xd")
-        val id = jdbcDatabaseRepository.add(todoItem)
+        val todoItemAdded = jdbcDatabaseRepository.add(todoItem)
 
         val expected = listOf(todoItem)
-        assertEquals(id, todoItem.id)
+        assertEquals(todoItemAdded.id, todoItem.id)
         assertEquals(expected, jdbcDatabaseRepository.getAll())
-        jdbcDatabaseRepository.delete(id)
+        jdbcDatabaseRepository.delete(todoItemAdded.id)
         assertEquals(listOf<TodoItem>(),jdbcDatabaseRepository.getAll())
     }
 }

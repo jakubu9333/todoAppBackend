@@ -3,7 +3,6 @@ package com.jakubu9333.repositories
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.sql.Connection
-import java.sql.Statement
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -33,13 +32,13 @@ class JdbcDatabaseRepository(private val dataSource: DataSource) : TodoRepositor
         }
     }
 
-    override suspend fun add(todoItem: TodoItem): UUID =
+    override suspend fun add(todoItem: TodoItem): TodoItem=
         runQuery {
             val statement = it.prepareStatement(INSERT_SQL)
             statement.setObject(1, todoItem.id)
             statement.setString(2, todoItem.item)
             statement.executeUpdate()
-            return@runQuery todoItem.id
+            return@runQuery todoItem
         }
 
     override suspend fun addBatch(todoItems: List<TodoItem>) {
